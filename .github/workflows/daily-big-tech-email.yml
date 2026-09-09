@@ -1,0 +1,28 @@
+name: Daily big tech email
+
+on:
+  schedule:
+    # 9:00 AM America/New_York (EST=14:00 UTC, EDT=13:00 UTC).
+    # Runs at 13:00 UTC year-round; close enough for a morning digest.
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Send daily big-tech digest
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_TO: inezaodon1@gmail.com
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          DIGEST_TIMEZONE: America/New_York
+        run: node scripts/daily-big-tech-email.mjs

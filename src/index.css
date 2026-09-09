@@ -77,6 +77,22 @@ a {
   font-size: 1.05rem;
 }
 
+.email-note {
+  max-width: 36rem;
+  margin: 0;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--simplify);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.email-note strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .tabs {
   display: flex;
   flex-wrap: wrap;

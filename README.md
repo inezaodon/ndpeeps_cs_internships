@@ -11,7 +11,30 @@ Views:
 - **Big tech** — roles from major tech / trading firms, grouped by company
 - **AI roles** — AI / ML / data-focused internships
 
-## Run
+## Daily email (big tech)
+
+Every morning (~9 AM ET), GitHub Actions emails **inezaodon1@gmail.com** a digest of big-tech internships posted that day.
+
+### One-time setup (required)
+
+1. Create a free [Resend](https://resend.com) account and API key.
+2. Add the key as a repo secret named `RESEND_API_KEY`:
+   ```bash
+   gh secret set RESEND_API_KEY --repo inezaodon/ndpeeps_cs_internships
+   ```
+3. (Optional) After verifying a domain in Resend, set `EMAIL_FROM` to something like `Internships <alerts@yourdomain.com>`. Until then, Resend’s test sender works for delivery to your own inbox.
+4. Trigger a test run:
+   ```bash
+   gh workflow run "Daily big tech email" --repo inezaodon/ndpeeps_cs_internships
+   ```
+
+Dry-run locally (no email sent):
+
+```bash
+npm run email:digest:dry
+```
+
+## Run the site
 
 ```bash
 npm install

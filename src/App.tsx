@@ -119,6 +119,10 @@ export default function App() {
           A personal log of roles from SimplifyJobs and Underclassmen Opportunities — by day,
           big tech, or AI-focused roles.
         </p>
+        <p className="email-note">
+          Daily email digest: big-tech posts from each day are sent to{" "}
+          <strong>inezaodon1@gmail.com</strong> every morning.
+        </p>
       </header>
 
       <nav className="tabs" role="tablist" aria-label="Views">
