@@ -10,7 +10,12 @@ const SIMPLIFY_URL =
 const UNDERCLASSMEN_URL =
   "https://raw.githubusercontent.com/Jose-Gael-Cruz-Lopez/underclassmen-opportunities/main/README.md";
 
-const EMAIL_TO = process.env.EMAIL_TO || "inezaodon1@gmail.com";
+const EMAIL_TO = (
+  process.env.EMAIL_TO || "inezaodon1@gmail.com,oineza@nd.edu"
+)
+  .split(",")
+  .map((addr) => addr.trim())
+  .filter(Boolean);
 const TIMEZONE = process.env.DIGEST_TIMEZONE || "America/New_York";
 
 const BIG_TECH = [
@@ -306,7 +311,7 @@ async function sendWithResend({ subject, html, text }) {
     },
     body: JSON.stringify({
       from,
-      to: [EMAIL_TO],
+      to: EMAIL_TO,
       subject,
       html,
       text,
@@ -317,12 +322,14 @@ async function sendWithResend({ subject, html, text }) {
   if (!res.ok) {
     throw new Error(`Resend failed (${res.status}): ${body}`);
   }
-  console.log("Email sent:", body);
+  console.log("Email sent to", EMAIL_TO.join(", "), "→", body);
 }
 
 async function main() {
   const date = process.env.DIGEST_DATE || todayInTz(TIMEZONE);
-  console.log(`Building big-tech digest for ${date} (${TIMEZONE}) → ${EMAIL_TO}`);
+  console.log(
+    `Building big-tech digest for ${date} (${TIMEZONE}) → ${EMAIL_TO.join(", ")}`,
+  );
 
   const [simplify, under] = await Promise.all([fetchSimplify(), fetchUnderclassmen()]);
   const todays = [...simplify, ...under].filter((l) => l.datePosted === date);

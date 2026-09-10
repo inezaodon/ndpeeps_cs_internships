@@ -121,7 +121,8 @@ export default function App() {
         </p>
         <p className="email-note">
           Daily email digest: big-tech posts from each day are sent to{" "}
-          <strong>inezaodon1@gmail.com</strong> every morning.
+          <strong>inezaodon1@gmail.com</strong> and <strong>oineza@nd.edu</strong> every
+          morning.
         </p>
       </header>
 

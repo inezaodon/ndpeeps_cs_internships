@@ -22,7 +22,7 @@ jobs:
       - name: Send daily big-tech digest
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          EMAIL_TO: inezaodon1@gmail.com
+          EMAIL_TO: inezaodon1@gmail.com,oineza@nd.edu
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           DIGEST_TIMEZONE: America/New_York
         run: node scripts/daily-big-tech-email.mjs
