@@ -1,11 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { filterAiListings, groupByBigTech } from "./classify";
 import { formatDayLabel, groupByDay } from "./group";
+import {
+  clearDispatchToken,
+  getDispatchToken,
+  setDispatchToken,
+  triggerDigestEmail,
+} from "./sendDigest";
 import { fetchAllListings } from "./sources";
 import type { Listing, SourceId } from "./types";
 
 type Tab = "daily" | "big-tech" | "ai";
 type Filter = "all" | SourceId | "active-only";
+type DigestStatus = "idle" | "sending" | "sent" | "error";
 
 function ListingRow({ listing, showDate = true }: { listing: Listing; showDate?: boolean }) {
   const isUnder = listing.source === "underclassmen";
@@ -46,6 +53,10 @@ export default function App() {
   const [filter, setFilter] = useState<Filter>("active-only");
   const [openDays, setOpenDays] = useState<Record<string, boolean>>({});
   const [openCompanies, setOpenCompanies] = useState<Record<string, boolean>>({});
+  const [digestStatus, setDigestStatus] = useState<DigestStatus>("idle");
+  const [digestMessage, setDigestMessage] = useState<string | null>(null);
+  const [showTokenForm, setShowTokenForm] = useState(false);
+  const [tokenDraft, setTokenDraft] = useState("");
 
   async function load() {
     setLoading(true);
@@ -69,6 +80,44 @@ export default function App() {
   useEffect(() => {
     void load();
   }, []);
+
+  async function handleSendDigest() {
+    setDigestMessage(null);
+    let token = getDispatchToken();
+    if (!token) {
+      setShowTokenForm(true);
+      setDigestMessage(
+        "One-time setup: paste a GitHub fine-grained token with Actions write access on this repo.",
+      );
+      return;
+    }
+
+    setDigestStatus("sending");
+    try {
+      await triggerDigestEmail(token);
+      setDigestStatus("sent");
+      setDigestMessage(
+        "Digest started. Check inezaodon1@gmail.com and oineza@nd.edu in about a minute.",
+      );
+    } catch (err) {
+      setDigestStatus("error");
+      const msg = err instanceof Error ? err.message : "Failed to send digest";
+      setDigestMessage(msg);
+      if (/token|401|403|rejected/i.test(msg)) {
+        clearDispatchToken();
+        setShowTokenForm(true);
+      }
+    }
+  }
+
+  function saveTokenAndSend(e: FormEvent) {
+    e.preventDefault();
+    if (!tokenDraft.trim()) return;
+    setDispatchToken(tokenDraft);
+    setTokenDraft("");
+    setShowTokenForm(false);
+    void handleSendDigest();
+  }
 
   const basePool = useMemo(() => {
     return listings.filter((l) => {
@@ -125,6 +174,49 @@ export default function App() {
           go to <strong>inezaodon1@gmail.com</strong> and <strong>oineza@nd.edu</strong>.
           Underclassmen roles are highlighted — no manual refresh needed.
         </p>
+        <div className="digest-actions">
+          <button
+            type="button"
+            className="send-digest"
+            onClick={() => void handleSendDigest()}
+            disabled={digestStatus === "sending"}
+          >
+            {digestStatus === "sending" ? "Sending today’s digest…" : "Email today’s digest"}
+          </button>
+          <button
+            type="button"
+            className="token-setup"
+            onClick={() => setShowTokenForm((v) => !v)}
+          >
+            {showTokenForm ? "Hide token setup" : "GitHub token setup"}
+          </button>
+        </div>
+        {showTokenForm && (
+          <form className="token-form" onSubmit={saveTokenAndSend}>
+            <p>
+              Create a fine-grained PAT with <strong>Actions: Read and write</strong> for{" "}
+              <code>inezaodon/ndpeeps_cs_internships</code>, paste it once, and it stays in this
+              browser only.
+            </p>
+            <input
+              type="password"
+              autoComplete="off"
+              placeholder="github_pat_…"
+              value={tokenDraft}
+              onChange={(e) => setTokenDraft(e.target.value)}
+            />
+            <button type="submit" className="send-digest" disabled={!tokenDraft.trim()}>
+              Save token & send
+            </button>
+          </form>
+        )}
+        {digestMessage && (
+          <p
+            className={`digest-status${digestStatus === "error" ? " digest-status--error" : ""}${digestStatus === "sent" ? " digest-status--ok" : ""}`}
+          >
+            {digestMessage}
+          </p>
+        )}
       </header>
 
       <nav className="tabs" role="tablist" aria-label="Views">

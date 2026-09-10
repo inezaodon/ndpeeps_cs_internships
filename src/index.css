@@ -93,6 +93,80 @@ a {
   font-weight: 600;
 }
 
+.digest-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.send-digest {
+  border: 0;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: 999px;
+  padding: 0.65rem 1.15rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.send-digest:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.send-digest:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.token-setup {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  cursor: pointer;
+}
+
+.token-form {
+  display: grid;
+  gap: 0.65rem;
+  max-width: 36rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0.85rem;
+}
+
+.token-form p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.token-form input {
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  padding: 0.65rem 0.75rem;
+  background: #fff;
+}
+
+.digest-status {
+  margin: 0;
+  max-width: 36rem;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.digest-status--ok {
+  color: var(--simplify);
+}
+
+.digest-status--error {
+  color: #7a2a22;
+}
+
 .tabs {
   display: flex;
   flex-wrap: wrap;

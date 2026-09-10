@@ -27,6 +27,8 @@ Manual test (optional):
 gh workflow run "Daily internship digest" --repo inezaodon/ndpeeps_cs_internships
 ```
 
+Or use the **Email today’s digest** button on the site. First click asks for a GitHub fine-grained PAT with **Actions: Read and write** on this repo; the token is saved in your browser only.
+
 Required secret (already set if emails are working): `RESEND_API_KEY`.
 
 ## Run the site locally
