@@ -1,10 +1,12 @@
-name: Daily big tech email
+name: Daily internship digest
 
 on:
   schedule:
-    # 9:00 AM America/New_York (EST=14:00 UTC, EDT=13:00 UTC).
-    # Runs at 13:00 UTC year-round; close enough for a morning digest.
+    # Fresh pull from both internship repos + email digest.
+    # ~9:00 AM America/New_York (13:00 UTC during EDT)
     - cron: "0 13 * * *"
+    # ~6:00 PM America/New_York (22:00 UTC during EDT) — catches afternoon posts
+    - cron: "0 22 * * *"
   workflow_dispatch:
 
 jobs:
@@ -19,7 +21,7 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Send daily big-tech digest
+      - name: Pull listings and send digest email
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           EMAIL_TO: inezaodon1@gmail.com,oineza@nd.edu

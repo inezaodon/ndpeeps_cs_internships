@@ -11,35 +11,25 @@ Views:
 - **Big tech** — roles from major tech / trading firms, grouped by company
 - **AI roles** — AI / ML / data-focused internships
 
-## Daily email (big tech)
+## Automated daily emails (hands-off)
 
-Every morning (~9 AM ET), GitHub Actions emails **inezaodon1@gmail.com** and **oineza@nd.edu** a digest with:
+This is **fully automated**. You do not need to open the site or refresh anything.
 
-1. **Underclassmen opportunities** posted that day (highlighted)
-2. **Big tech** roles posted that day
+GitHub Actions runs twice a day (~**9 AM** and ~**6 PM** Eastern):
 
-On the site, underclassmen rows are sorted to the top of each day and highlighted in blue.
+1. Pulls the latest listings from SimplifyJobs + Underclassmen Opportunities
+2. Builds a digest (underclassmen highlighted + big tech)
+3. Emails **inezaodon1@gmail.com** and **oineza@nd.edu**
 
-### One-time setup (required)
-
-1. Create a free [Resend](https://resend.com) account and API key.
-2. Add the key as a repo secret named `RESEND_API_KEY`:
-   ```bash
-   gh secret set RESEND_API_KEY --repo inezaodon/ndpeeps_cs_internships
-   ```
-3. (Optional) After verifying a domain in Resend, set `EMAIL_FROM` to something like `Internships <alerts@yourdomain.com>`. Until then, Resend’s test sender works for delivery to your own inbox.
-4. Trigger a test run:
-   ```bash
-   gh workflow run "Daily big tech email" --repo inezaodon/ndpeeps_cs_internships
-   ```
-
-Dry-run locally (no email sent):
+Manual test (optional):
 
 ```bash
-npm run email:digest:dry
+gh workflow run "Daily internship digest" --repo inezaodon/ndpeeps_cs_internships
 ```
 
-## Run the site
+Required secret (already set if emails are working): `RESEND_API_KEY`.
+
+## Run the site locally
 
 ```bash
 npm install
