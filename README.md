@@ -13,7 +13,12 @@ Views:
 
 ## Daily email (big tech)
 
-Every morning (~9 AM ET), GitHub Actions emails **inezaodon1@gmail.com** and **oineza@nd.edu** a digest of big-tech internships posted that day.
+Every morning (~9 AM ET), GitHub Actions emails **inezaodon1@gmail.com** and **oineza@nd.edu** a digest with:
+
+1. **Underclassmen opportunities** posted that day (highlighted)
+2. **Big tech** roles posted that day
+
+On the site, underclassmen rows are sorted to the top of each day and highlighted in blue.
 
 ### One-time setup (required)
 

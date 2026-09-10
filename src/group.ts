@@ -11,8 +11,12 @@ export function groupByDay(listings: Listing[]): DayBucket[] {
 
   const days: DayBucket[] = [];
   for (const [date, dayListings] of map) {
+    // Underclassmen first so they stand out in the daily feed
     dayListings.sort((a, b) => {
-      if (a.source !== b.source) return a.source.localeCompare(b.source);
+      if (a.source !== b.source) {
+        if (a.source === "underclassmen") return -1;
+        if (b.source === "underclassmen") return 1;
+      }
       return a.company.localeCompare(b.company);
     });
 

@@ -236,31 +236,50 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
-function buildEmail(date, groups) {
-  const total = groups.reduce((n, g) => n + g.listings.length, 0);
+function renderListingItem(l, { highlight = false } = {}) {
+  const link = l.url
+    ? `<a href="${escapeHtml(l.url)}" style="color:${highlight ? "#1d4f8c" : "#0b6e5f"};font-weight:600;">Apply →</a>`
+    : "";
+  const wrapStyle = highlight
+    ? "margin:0 0 0.75rem;padding:0.75rem 0.85rem;background:#eef4fb;border-left:4px solid #1d4f8c;border-radius:6px;list-style:none;"
+    : "margin:0 0 0.65rem;";
+  return `<li style="${wrapStyle}">
+    <strong>${escapeHtml(l.company)}</strong> — ${escapeHtml(l.role)}<br/>
+    <span style="color:#3d534c;font-size:14px;">${escapeHtml(l.location)} · ${escapeHtml(l.source)}${l.category ? ` · ${escapeHtml(l.category)}` : ""}</span>
+    ${link ? `<br/>${link}` : ""}
+  </li>`;
+}
+
+function buildEmail(date, { bigTechGroups, underclassmenListings }) {
+  const bigTechTotal = bigTechGroups.reduce((n, g) => n + g.listings.length, 0);
+  const underTotal = underclassmenListings.length;
+  const total = bigTechTotal + underTotal;
+
   const subject =
     total === 0
-      ? `Big tech internships — none new on ${date}`
-      : `Big tech internships — ${total} new on ${date}`;
+      ? `Internship digest — nothing new on ${date}`
+      : `Internship digest — ${bigTechTotal} big tech, ${underTotal} underclassmen on ${date}`;
 
-  const rows =
-    total === 0
-      ? `<p style="color:#3d534c;">No new big-tech internship posts were found for ${escapeHtml(date)}.</p>`
-      : groups
+  const underSection =
+    underTotal === 0
+      ? `<p style="color:#3d534c;margin:0;">No new underclassmen-opportunity posts for ${escapeHtml(date)}.</p>`
+      : `<ul style="padding:0;margin:0;list-style:none;">${underclassmenListings
+          .map((l) => renderListingItem(l, { highlight: true }))
+          .join("")}</ul>`;
+
+  const bigTechSection =
+    bigTechTotal === 0
+      ? `<p style="color:#3d534c;">No new big-tech internship posts for ${escapeHtml(date)}.</p>`
+      : bigTechGroups
           .map((g) => {
             const items = g.listings
-              .map((l) => {
-                const link = l.url
-                  ? `<a href="${escapeHtml(l.url)}" style="color:#0b6e5f;">Apply</a>`
-                  : "";
-                return `<li style="margin:0 0 0.65rem;">
-                  <strong>${escapeHtml(l.role)}</strong><br/>
-                  <span style="color:#3d534c;font-size:14px;">${escapeHtml(l.location)} · ${escapeHtml(l.source)}${l.category ? ` · ${escapeHtml(l.category)}` : ""}</span>
-                  ${link ? `<br/>${link}` : ""}
-                </li>`;
-              })
+              .map((l) =>
+                renderListingItem(l, {
+                  highlight: l.source === "Underclassmen",
+                }),
+              )
               .join("");
-            return `<h2 style="font-size:18px;margin:1.4rem 0 0.5rem;color:#10241f;">${escapeHtml(g.company)} <span style="color:#3d534c;font-weight:500;">(${g.listings.length})</span></h2><ul style="padding-left:1.1rem;margin:0;">${items}</ul>`;
+            return `<h3 style="font-size:17px;margin:1.2rem 0 0.45rem;color:#10241f;">${escapeHtml(g.company)} <span style="color:#3d534c;font-weight:500;">(${g.listings.length})</span></h3><ul style="padding-left:1.1rem;margin:0;${g.listings.some((l) => l.source === "Underclassmen") ? "list-style:none;padding-left:0;" : ""}">${items}</ul>`;
           })
           .join("");
 
@@ -268,29 +287,50 @@ function buildEmail(date, groups) {
 <html><body style="margin:0;padding:24px;background:#eef4f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#10241f;">
   <div style="max-width:640px;margin:0 auto;background:#fff;border-radius:12px;padding:28px 24px;border:1px solid rgba(16,36,31,0.1);">
     <p style="margin:0 0 0.35rem;color:#0b6e5f;font-weight:600;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;">ndpeeps CS internships</p>
-    <h1 style="margin:0 0 0.5rem;font-size:24px;line-height:1.2;">Big tech posts — ${escapeHtml(date)}</h1>
-    <p style="margin:0 0 1.25rem;color:#3d534c;">Daily digest of big-tech / trading firm internships posted today.</p>
-    ${rows}
+    <h1 style="margin:0 0 0.5rem;font-size:24px;line-height:1.2;">Daily digest — ${escapeHtml(date)}</h1>
+    <p style="margin:0 0 1.25rem;color:#3d534c;">Big-tech roles plus underclassmen opportunities posted today. Underclassmen listings are highlighted in blue.</p>
+
+    <div style="margin:0 0 1.75rem;padding:1rem 1.1rem;background:linear-gradient(180deg,#f3f7fc 0%,#eef4fb 100%);border:1px solid rgba(29,79,140,0.25);border-radius:10px;">
+      <h2 style="font-size:18px;margin:0 0 0.35rem;color:#1d4f8c;">Underclassmen opportunities · ${underTotal}</h2>
+      <p style="margin:0 0 0.9rem;color:#3d534c;font-size:14px;">From the Underclassmen Opportunities list — highlighted for quick scanning.</p>
+      ${underSection}
+    </div>
+
+    <h2 style="font-size:18px;margin:0 0 0.5rem;color:#10241f;">Big tech · ${bigTechTotal}</h2>
+    <p style="margin:0 0 0.75rem;color:#3d534c;font-size:14px;">Major tech / trading firms from both sources.</p>
+    ${bigTechSection}
+
     <p style="margin:2rem 0 0;padding-top:1rem;border-top:1px solid rgba(16,36,31,0.1);font-size:13px;color:#3d534c;">
       Sources: SimplifyJobs Summer Internships + Underclassmen Opportunities.
     </p>
   </div>
 </body></html>`;
 
-  const text =
-    total === 0
-      ? `No new big-tech internship posts for ${date}.`
-      : groups
+  const textParts = [
+    `Daily digest — ${date}`,
+    "",
+    `UNDERCLASSMEN (${underTotal})`,
+    underTotal === 0
+      ? "No new underclassmen posts."
+      : underclassmenListings
+          .map((l) => `★ ${l.company} — ${l.role} (${l.location}) ${l.url || ""}`)
+          .join("\n"),
+    "",
+    `BIG TECH (${bigTechTotal})`,
+    bigTechTotal === 0
+      ? "No new big-tech posts."
+      : bigTechGroups
           .map(
             (g) =>
               `${g.company}\n` +
               g.listings
-                .map((l) => `- ${l.role} (${l.location}) ${l.url || ""}`)
+                .map((l) => `- ${l.role} (${l.location}) [${l.source}] ${l.url || ""}`)
                 .join("\n"),
           )
-          .join("\n\n");
+          .join("\n\n"),
+  ];
 
-  return { subject, html, text };
+  return { subject, html, text: textParts.join("\n") };
 }
 
 async function sendWithResend({ subject, html, text }) {
@@ -328,11 +368,15 @@ async function sendWithResend({ subject, html, text }) {
 async function main() {
   const date = process.env.DIGEST_DATE || todayInTz(TIMEZONE);
   console.log(
-    `Building big-tech digest for ${date} (${TIMEZONE}) → ${EMAIL_TO.join(", ")}`,
+    `Building internship digest for ${date} (${TIMEZONE}) → ${EMAIL_TO.join(", ")}`,
   );
 
   const [simplify, under] = await Promise.all([fetchSimplify(), fetchUnderclassmen()]);
   const todays = [...simplify, ...under].filter((l) => l.datePosted === date);
+
+  const underclassmenListings = todays
+    .filter((l) => l.source === "Underclassmen")
+    .sort((a, b) => a.company.localeCompare(b.company) || a.role.localeCompare(b.role));
 
   const byCompany = new Map();
   for (const listing of todays) {
@@ -343,17 +387,18 @@ async function main() {
     byCompany.set(matched, bucket);
   }
 
-  const groups = [...byCompany.entries()]
+  const bigTechGroups = [...byCompany.entries()]
     .map(([company, listings]) => ({
       company,
       listings: listings.sort((a, b) => a.role.localeCompare(b.role)),
     }))
     .sort((a, b) => b.listings.length - a.listings.length || a.company.localeCompare(b.company));
 
-  const total = groups.reduce((n, g) => n + g.listings.length, 0);
-  console.log(`Found ${total} big-tech listing(s) across ${groups.length} company group(s).`);
+  console.log(
+    `Found ${bigTechGroups.reduce((n, g) => n + g.listings.length, 0)} big-tech and ${underclassmenListings.length} underclassmen listing(s).`,
+  );
 
-  const email = buildEmail(date, groups);
+  const email = buildEmail(date, { bigTechGroups, underclassmenListings });
 
   if (process.env.DRY_RUN === "1") {
     console.log("DRY_RUN=1 — skipping send.");

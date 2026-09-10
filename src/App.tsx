@@ -8,9 +8,10 @@ type Tab = "daily" | "big-tech" | "ai";
 type Filter = "all" | SourceId | "active-only";
 
 function ListingRow({ listing, showDate = true }: { listing: Listing; showDate?: boolean }) {
+  const isUnder = listing.source === "underclassmen";
   return (
     <a
-      className="listing"
+      className={`listing${isUnder ? " listing--underclassmen" : ""}`}
       href={listing.url || undefined}
       target={listing.url ? "_blank" : undefined}
       rel={listing.url ? "noreferrer" : undefined}
@@ -19,7 +20,7 @@ function ListingRow({ listing, showDate = true }: { listing: Listing; showDate?:
       }}
     >
       <span className={`badge ${listing.source}`}>
-        {listing.source === "simplify" ? "Simplify" : "Underclassmen"}
+        {isUnder ? "Underclassmen ★" : "Simplify"}
       </span>
       <div className="listing-main">
         <p className="listing-company">{listing.company}</p>
@@ -120,9 +121,9 @@ export default function App() {
           big tech, or AI-focused roles.
         </p>
         <p className="email-note">
-          Daily email digest: big-tech posts from each day are sent to{" "}
-          <strong>inezaodon1@gmail.com</strong> and <strong>oineza@nd.edu</strong> every
-          morning.
+          Daily email digest: big-tech + underclassmen posts each day go to{" "}
+          <strong>inezaodon1@gmail.com</strong> and <strong>oineza@nd.edu</strong>. Underclassmen
+          roles are highlighted.
         </p>
       </header>
 

@@ -310,6 +310,24 @@ a {
   background: rgba(255, 255, 255, 0.55);
 }
 
+.listing--underclassmen {
+  background: rgba(29, 79, 140, 0.08);
+  border-left: 3px solid var(--under);
+  box-shadow: inset 0 0 0 1px rgba(29, 79, 140, 0.08);
+}
+
+.listing--underclassmen:hover {
+  background: rgba(29, 79, 140, 0.12);
+}
+
+.listing--underclassmen .listing-company {
+  color: #163a66;
+}
+
+.listing--underclassmen .listing-link {
+  color: var(--under);
+}
+
 .listing-main {
   min-width: 0;
 }
