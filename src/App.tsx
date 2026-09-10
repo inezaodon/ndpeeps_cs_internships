@@ -121,7 +121,7 @@ export default function App() {
           big tech, or AI-focused roles.
         </p>
         <p className="email-note">
-          Daily email digest is automated (~9 AM & 6 PM ET): big-tech + underclassmen posts
+          Daily email digest is automated (~9 AM & 9 PM ET): big-tech + underclassmen posts
           go to <strong>inezaodon1@gmail.com</strong> and <strong>oineza@nd.edu</strong>.
           Underclassmen roles are highlighted — no manual refresh needed.
         </p>

@@ -15,7 +15,7 @@ Views:
 
 This is **fully automated**. You do not need to open the site or refresh anything.
 
-GitHub Actions runs twice a day (~**9 AM** and ~**6 PM** Eastern):
+GitHub Actions runs twice a day (~**9 AM** and ~**9 PM** Eastern):
 
 1. Pulls the latest listings from SimplifyJobs + Underclassmen Opportunities
 2. Builds a digest (underclassmen highlighted + big tech)
