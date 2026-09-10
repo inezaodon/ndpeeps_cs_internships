@@ -342,27 +342,46 @@ async function sendWithResend({ subject, html, text }) {
   }
 
   const from = process.env.EMAIL_FROM || "ndpeeps CS Internships <onboarding@resend.dev>";
+  const results = [];
+  const failures = [];
 
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to: EMAIL_TO,
-      subject,
-      html,
-      text,
-    }),
-  });
+  // Send one recipient at a time so a blocked address (e.g. unverified domain)
+  // does not prevent delivery to the others.
+  for (const to of EMAIL_TO) {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject,
+        html,
+        text,
+      }),
+    });
 
-  const body = await res.text();
-  if (!res.ok) {
-    throw new Error(`Resend failed (${res.status}): ${body}`);
+    const body = await res.text();
+    if (!res.ok) {
+      console.error(`Resend failed for ${to} (${res.status}): ${body}`);
+      failures.push(`${to}: ${body}`);
+      continue;
+    }
+    console.log("Email sent to", to, "→", body);
+    results.push(to);
   }
-  console.log("Email sent to", EMAIL_TO.join(", "), "→", body);
+
+  if (results.length === 0) {
+    throw new Error(`Resend failed for all recipients. ${failures.join(" | ")}`);
+  }
+
+  if (failures.length > 0) {
+    console.warn(
+      `Partial send: delivered to ${results.join(", ")}. Failed: ${failures.join(" | ")}`,
+    );
+  }
 }
 
 async function main() {
